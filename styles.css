@@ -1,0 +1,495 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.screen {
+    display: none;
+    width: 100%;
+    max-width: 900px;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.screen.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.container {
+    background: white;
+    border-radius: 15px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+    color: #667eea;
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+h2 {
+    color: #764ba2;
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+h3 {
+    color: #667eea;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+.info-box {
+    background: #f8f9ff;
+    border-left: 4px solid #667eea;
+    padding: 20px;
+    margin: 20px 0;
+    border-radius: 5px;
+}
+
+.info-section {
+    background: #f8f9ff;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    border-left: 4px solid #764ba2;
+}
+
+.info-section ul {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.info-section li {
+    margin: 8px 0;
+    color: #333;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.menu-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    font-weight: bold;
+}
+
+.menu-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+}
+
+.menu-btn:active {
+    transform: translateY(0);
+}
+
+.back-btn {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1em;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 20px;
+    transition: background 0.2s;
+}
+
+.back-btn:hover {
+    background: #5a6268;
+}
+
+/* Game Screen Styles */
+.game-screen .container,
+.game-container {
+    background: white;
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.stats {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    background: #f8f9ff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    color: #667eea;
+}
+
+.stat span {
+    color: #764ba2;
+    font-size: 1.2em;
+}
+
+/* Defense Game Canvas */
+#defense-canvas {
+    border: 3px solid #667eea;
+    border-radius: 10px;
+    display: block;
+    margin: 20px auto;
+    background: #1a1a2e;
+    max-width: 100%;
+    height: auto;
+}
+
+.game-controls {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.status-message {
+    text-align: center;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 8px;
+    font-weight: bold;
+    min-height: 50px;
+}
+
+.status-message.success {
+    background: #d4edda;
+    color: #155724;
+    border: 2px solid #c3e6cb;
+}
+
+.status-message.error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 2px solid #f5c6cb;
+}
+
+.status-message.warning {
+    background: #fff3cd;
+    color: #856404;
+    border: 2px solid #ffeaa7;
+}
+
+.status-message.info {
+    background: #d1ecf1;
+    color: #0c5460;
+    border: 2px solid #bee5eb;
+}
+
+/* Energy Meter Game */
+.energy-meter-container {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.meter-bar {
+    width: 100%;
+    height: 40px;
+    background: #e0e0e0;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 15px 0;
+    border: 3px solid #667eea;
+}
+
+.meter-fill {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+    transition: width 0.5s ease, background 0.5s ease;
+    border-radius: 20px;
+}
+
+.meter-fill.low {
+    background: linear-gradient(90deg, #ffc107 0%, #ff9800 100%);
+}
+
+.meter-fill.critical {
+    background: linear-gradient(90deg, #dc3545 0%, #c82333 100%);
+    animation: pulse 0.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
+
+#atp-value {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #667eea;
+    margin-top: 10px;
+}
+
+.task-area {
+    background: #f8f9ff;
+    padding: 30px;
+    border-radius: 10px;
+    margin: 20px 0;
+    min-height: 200px;
+}
+
+#current-task {
+    color: #764ba2;
+    margin-bottom: 20px;
+    font-size: 1.3em;
+}
+
+#task-buttons {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.task-btn {
+    background: #667eea;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 150px;
+}
+
+.task-btn:hover {
+    background: #764ba2;
+    transform: scale(1.05);
+}
+
+.task-btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Pathway Puzzle */
+.pathway-area {
+    margin: 20px 0;
+}
+
+.molecules-bank {
+    background: #f8f9ff;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+}
+
+.molecules-grid {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+    justify-content: center;
+}
+
+.molecule {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 8px;
+    cursor: move;
+    font-weight: bold;
+    user-select: none;
+    transition: transform 0.2s, opacity 0.2s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.molecule:hover {
+    transform: scale(1.05);
+}
+
+.molecule.dragging {
+    opacity: 0.5;
+}
+
+.molecule.placed {
+    cursor: default;
+    opacity: 0.3;
+}
+
+.etc-chain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.etc-complex {
+    background: #f8f9ff;
+    border: 3px solid #667eea;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.etc-complex h4 {
+    color: #667eea;
+    margin-bottom: 5px;
+}
+
+.complex-name {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 10px;
+    min-height: 35px;
+}
+
+.drop-zone {
+    min-height: 60px;
+    border: 2px dashed #ccc;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    transition: all 0.2s;
+    padding: 5px;
+}
+
+.drop-zone.drag-over {
+    border-color: #667eea;
+    background: #e8ebff;
+}
+
+.drop-zone.filled {
+    border-style: solid;
+    border-color: #28a745;
+    background: #d4edda;
+}
+
+.drop-zone.error {
+    border-color: #dc3545;
+    background: #f8d7da;
+    animation: shake 0.3s;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+}
+
+.mutation-info {
+    background: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 5px;
+}
+
+.mutation-info p {
+    color: #856404;
+    margin: 0;
+}
+
+/* Tutorial Box */
+.tutorial-box {
+    background: #f8f9ff;
+    padding: 30px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.tutorial-box h3 {
+    color: #667eea;
+    margin-top: 15px;
+}
+
+.tutorial-box ul {
+    margin-left: 20px;
+    margin-top: 10px;
+}
+
+.tutorial-box li {
+    margin: 10px 0;
+    line-height: 1.6;
+}
+
+.tutorial-box strong {
+    color: #764ba2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container, .game-container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    h2 {
+        font-size: 1.2em;
+    }
+
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .stats {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #defense-canvas {
+        width: 100% !important;
+        height: auto !important;
+    }
+
+    .etc-chain {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Particles and visual effects for canvas */
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    pointer-events: none;
+}

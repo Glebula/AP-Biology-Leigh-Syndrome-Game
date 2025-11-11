@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leigh Syndrome: Interactive Learning Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Main Menu Screen -->
+    <div id="main-menu" class="screen active">
+        <div class="container">
+            <h1>Leigh Syndrome</h1>
+            <h2>Interactive Learning Experience</h2>
+            <div class="info-box">
+                <p><strong>What is Leigh Syndrome?</strong></p>
+                <p>Leigh Syndrome is a rare inherited neurometabolic disorder that affects the central nervous system.
+                   It's caused by mutations in mitochondrial DNA or nuclear DNA that affect mitochondrial function,
+                   leading to progressive loss of mental and movement abilities.</p>
+            </div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="showScreen('about-screen')">📚 Learn About Leigh Syndrome</button>
+                <button class="menu-btn" onclick="startGame('defense')">🎮 Game 1: Mitochondria Defense</button>
+                <button class="menu-btn" onclick="startGame('energy')">⚡ Game 2: Energy Meter Challenge</button>
+                <button class="menu-btn" onclick="startGame('pathway')">🧬 Game 3: Pathway Puzzle - ETC</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Screen -->
+    <div id="about-screen" class="screen">
+        <div class="container">
+            <h1>Understanding Leigh Syndrome</h1>
+            <div class="info-section">
+                <h3>🧬 The Science</h3>
+                <p>Mitochondria are the "powerhouses" of cells, producing ATP (adenosine triphosphate) through cellular respiration.
+                   In Leigh Syndrome, genetic mutations disrupt the electron transport chain (ETC), severely reducing ATP production.</p>
+            </div>
+            <div class="info-section">
+                <h3>⚠️ Symptoms</h3>
+                <ul>
+                    <li>Muscle weakness and poor muscle tone</li>
+                    <li>Loss of motor skills</li>
+                    <li>Seizures</li>
+                    <li>Difficulty breathing and swallowing</li>
+                    <li>Vision and hearing problems</li>
+                    <li>Developmental delays</li>
+                </ul>
+            </div>
+            <div class="info-section">
+                <h3>🔬 Affected Systems</h3>
+                <p>The brain and nervous system require constant energy. When mitochondria fail, neurons (especially in the
+                   brainstem and basal ganglia) are severely affected, leading to neurological symptoms.</p>
+            </div>
+            <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Tutorial Screen -->
+    <div id="tutorial-screen" class="screen">
+        <div class="container">
+            <h1 id="tutorial-title">Tutorial</h1>
+            <div id="tutorial-content" class="tutorial-box"></div>
+            <button class="menu-btn" onclick="startGameFromTutorial()">Start Game</button>
+            <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Game 1: Mitochondria Defense -->
+    <div id="defense-game" class="screen game-screen">
+        <div class="game-container">
+            <div class="game-header">
+                <h2>Mitochondria Defense</h2>
+                <div class="stats">
+                    <div class="stat">ATP: <span id="defense-atp">100</span></div>
+                    <div class="stat">Score: <span id="defense-score">0</span></div>
+                    <div class="stat">Time: <span id="defense-time">60</span>s</div>
+                </div>
+            </div>
+            <canvas id="defense-canvas" width="800" height="600"></canvas>
+            <div class="game-controls">
+                <div id="defense-status" class="status-message"></div>
+                <button class="back-btn" onclick="endGame('defense')">End Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 2: Energy Meter Challenge -->
+    <div id="energy-game" class="screen game-screen">
+        <div class="game-container">
+            <div class="game-header">
+                <h2>Energy Meter Challenge</h2>
+                <div class="stats">
+                    <div class="stat">Tasks Completed: <span id="energy-tasks">0</span></div>
+                    <div class="stat">Round: <span id="energy-round">1</span></div>
+                </div>
+            </div>
+            <div class="energy-meter-container">
+                <h3>ATP Level</h3>
+                <div class="meter-bar">
+                    <div id="atp-bar" class="meter-fill"></div>
+                </div>
+                <div id="atp-value">100 / 100</div>
+            </div>
+            <div id="energy-task-area" class="task-area">
+                <h3 id="current-task">Click Start to Begin</h3>
+                <div id="task-buttons"></div>
+            </div>
+            <div id="energy-status" class="status-message"></div>
+            <div class="game-controls">
+                <button id="start-energy-btn" class="menu-btn" onclick="startEnergyGame()">Start</button>
+                <button class="back-btn" onclick="endGame('energy')">End Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game 3: Pathway Puzzle -->
+    <div id="pathway-game" class="screen game-screen">
+        <div class="game-container">
+            <div class="game-header">
+                <h2>Electron Transport Chain Puzzle</h2>
+                <div class="stats">
+                    <div class="stat">Correct: <span id="pathway-correct">0</span></div>
+                    <div class="stat">Mistakes: <span id="pathway-mistakes">0</span></div>
+                </div>
+            </div>
+            <div class="pathway-area">
+                <div class="molecules-bank">
+                    <h3>Drag molecules to the correct complexes:</h3>
+                    <div id="molecules-container" class="molecules-grid"></div>
+                </div>
+                <div class="etc-chain">
+                    <div class="etc-complex" id="complex-1" data-complex="1">
+                        <h4>Complex I</h4>
+                        <p class="complex-name">NADH Dehydrogenase</p>
+                        <div class="drop-zone" data-accepts="NADH"></div>
+                    </div>
+                    <div class="etc-complex" id="complex-2" data-complex="2">
+                        <h4>Complex II</h4>
+                        <p class="complex-name">Succinate Dehydrogenase</p>
+                        <div class="drop-zone" data-accepts="FADH2"></div>
+                    </div>
+                    <div class="etc-complex" id="complex-3" data-complex="3">
+                        <h4>Complex III</h4>
+                        <p class="complex-name">Cytochrome bc1</p>
+                        <div class="drop-zone" data-accepts="Electron"></div>
+                    </div>
+                    <div class="etc-complex" id="complex-4" data-complex="4">
+                        <h4>Complex IV</h4>
+                        <p class="complex-name">Cytochrome c Oxidase</p>
+                        <div class="drop-zone" data-accepts="O2"></div>
+                    </div>
+                    <div class="etc-complex" id="complex-5" data-complex="5">
+                        <h4>Complex V</h4>
+                        <p class="complex-name">ATP Synthase</p>
+                        <div class="drop-zone" data-accepts="H+"></div>
+                    </div>
+                </div>
+                <div id="pathway-status" class="status-message"></div>
+                <div class="mutation-info">
+                    <p>⚠️ <strong>Leigh Syndrome Impact:</strong> Mutations in Complex IV prevent oxygen from accepting electrons,
+                       blocking the entire electron transport chain and drastically reducing ATP production!</p>
+                </div>
+            </div>
+            <div class="game-controls">
+                <button class="menu-btn" onclick="resetPathwayGame()">Reset Puzzle</button>
+                <button class="back-btn" onclick="endGame('pathway')">End Game</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameover-screen" class="screen">
+        <div class="container">
+            <h1 id="gameover-title">Game Complete!</h1>
+            <div id="gameover-content" class="info-box"></div>
+            <div class="menu-buttons">
+                <button class="menu-btn" onclick="restartCurrentGame()">Play Again</button>
+                <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
