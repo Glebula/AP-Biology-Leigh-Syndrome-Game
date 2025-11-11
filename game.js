@@ -1,9 +1,16 @@
 // ==========================================
-// GLOBAL VARIABLES AND STATE
+// GLOBAL STATE
 // ==========================================
 
-let currentGame = null;
-let currentScreen = 'main-menu';
+let currentChapter = 0;
+let storyProgress = {
+    introStep: 0,
+    chapter1Complete: false,
+    chapter2Complete: false,
+    chapter3Complete: false,
+    chapter4Complete: false,
+    chapter5Complete: false
+};
 
 // ==========================================
 // SCREEN NAVIGATION
@@ -14,552 +21,631 @@ function showScreen(screenId) {
         screen.classList.remove('active');
     });
     document.getElementById(screenId).classList.add('active');
-    currentScreen = screenId;
 }
 
-function startGame(gameType) {
-    currentGame = gameType;
-    showTutorial(gameType);
-}
-
-function startGameFromTutorial() {
-    if (currentGame === 'defense') {
-        showScreen('defense-game');
-        initDefenseGame();
-    } else if (currentGame === 'energy') {
-        showScreen('energy-game');
-        resetEnergyGame();
-    } else if (currentGame === 'pathway') {
-        showScreen('pathway-game');
-        initPathwayGame();
-    }
-}
-
-function endGame(gameType) {
-    if (gameType === 'defense') {
-        stopDefenseGame();
-    } else if (gameType === 'energy') {
-        stopEnergyGame();
-    }
+function returnToMenu() {
     showScreen('main-menu');
-    currentGame = null;
 }
 
-function restartCurrentGame() {
-    if (currentGame) {
-        startGameFromTutorial();
+// ==========================================
+// STORY FLOW
+// ==========================================
+
+const introDialogues = [
+    "Hi, I'm Maya. I'm 16 years old.",
+    "I have Leigh Syndrome - a rare genetic disorder that affects my mitochondria.",
+    "You've probably learned that mitochondria are the 'powerhouses' of cells, right?",
+    "Well, mine don't work properly. They can't produce enough ATP - the energy my cells need.",
+    "Come with me, and I'll show you what life is like when your cells can't make energy...",
+    "Let's start with a normal morning in my life."
+];
+
+let currentDialogueIndex = 0;
+
+function startStory() {
+    currentDialogueIndex = 0;
+    showScreen('story-intro');
+    displayIntroDialogue();
+}
+
+function displayIntroDialogue() {
+    const textElement = document.getElementById('intro-text');
+    if (currentDialogueIndex < introDialogues.length) {
+        textElement.textContent = introDialogues[currentDialogueIndex];
+    }
+}
+
+function nextIntroDialogue() {
+    currentDialogueIndex++;
+    if (currentDialogueIndex < introDialogues.length) {
+        displayIntroDialogue();
+    } else {
+        // Start Chapter 1
+        startChapter(1);
+    }
+}
+
+function startChapter(chapterNum) {
+    currentChapter = chapterNum;
+    switch(chapterNum) {
+        case 1:
+            showScreen('chapter1');
+            initChapter1();
+            break;
+        case 2:
+            showScreen('chapter2');
+            initChapter2();
+            break;
+        case 3:
+            showScreen('chapter3');
+            initChapter3();
+            break;
+        case 4:
+            showScreen('chapter4');
+            initChapter4();
+            break;
+        case 5:
+            showScreen('chapter5');
+            initChapter5();
+            break;
     }
 }
 
 // ==========================================
-// TUTORIALS
+// CHAPTER 1: MAYA'S MORNING
 // ==========================================
 
-function showTutorial(gameType) {
-    const tutorials = {
-        defense: {
-            title: 'Tutorial: Mitochondria Defense',
-            content: `
-                <h3>🎯 Objective</h3>
-                <p>You are a mitochondrion inside a neuron. Your job is to produce ATP (energy) by collecting nutrients
-                   while avoiding toxins and mutations that damage your function.</p>
-
-                <h3>🎮 How to Play</h3>
-                <ul>
-                    <li><strong>Click on GREEN items</strong> (glucose and oxygen) to collect nutrients and produce ATP</li>
-                    <li><strong>Avoid RED items</strong> (cyanide and mutations) - clicking them damages your mitochondria</li>
-                    <li>Your <strong>ATP level</strong> constantly decreases - you must collect nutrients to maintain it</li>
-                    <li>If ATP drops to 0, the neuron fails and symptoms of Leigh Syndrome appear</li>
-                    <li>Survive for 60 seconds to win!</li>
-                </ul>
-
-                <h3>📚 What You'll Learn</h3>
-                <p>This game teaches how mitochondria need specific nutrients (glucose and oxygen) to produce ATP through
-                   cellular respiration. Toxins like cyanide and genetic mutations block this process, causing the energy
-                   crisis seen in Leigh Syndrome.</p>
-            `
+let chapter1 = {
+    energy: 100,
+    taskIndex: 0,
+    tasks: [
+        {
+            name: "Wake Up",
+            description: "The alarm goes off. It's 6:30 AM. You need to get ready for school.",
+            choices: [
+                { text: "Jump out of bed quickly", energy: -20, thought: "Ugh... that took way more energy than it should have. I'm already tired." },
+                { text: "Take it slow, sit up gradually", energy: -10, thought: "Good choice. I need to conserve energy. Even sitting up makes my muscles ache." }
+            ]
         },
-        energy: {
-            title: 'Tutorial: Energy Meter Challenge',
-            content: `
-                <h3>🎯 Objective</h3>
-                <p>Manage ATP levels while performing everyday tasks. Experience how mitochondrial dysfunction
-                   causes rapid energy depletion in Leigh Syndrome patients.</p>
-
-                <h3>🎮 How to Play</h3>
-                <ul>
-                    <li>Start with a full ATP bar (100 ATP)</li>
-                    <li>Tasks appear that require energy (walking, breathing, thinking, etc.)</li>
-                    <li>Click the task button to complete it - this uses ATP</li>
-                    <li><strong>Normal cells</strong> regenerate ATP quickly between tasks</li>
-                    <li><strong>After round 3:</strong> A mutation occurs! ATP regeneration becomes very slow</li>
-                    <li>When ATP hits 0, symptoms appear and you lose</li>
-                    <li>Try to complete as many tasks as possible!</li>
-                </ul>
-
-                <h3>📚 What You'll Learn</h3>
-                <p>This game demonstrates how Leigh Syndrome patients struggle with basic activities due to insufficient
-                   ATP production. Even simple tasks become exhausting when mitochondria can't keep up with energy demands.</p>
-            `
+        {
+            name: "Get Dressed",
+            description: "Time to put on your school clothes.",
+            choices: [
+                { text: "Rush to get dressed", energy: -25, thought: "Why is everything so exhausting? My arms feel like lead..." },
+                { text: "Take breaks between each piece of clothing", energy: -12, thought: "This takes forever, but I need to pace myself." }
+            ]
         },
-        pathway: {
-            title: 'Tutorial: Electron Transport Chain Puzzle',
-            content: `
-                <h3>🎯 Objective</h3>
-                <p>Learn how the Electron Transport Chain (ETC) produces ATP by correctly placing molecules
-                   in the five complexes. Discover exactly how Leigh Syndrome disrupts this process.</p>
-
-                <h3>🎮 How to Play</h3>
-                <ul>
-                    <li><strong>Drag molecules</strong> from the top to the correct complexes in the ETC</li>
-                    <li><strong>Complex I</strong> accepts NADH (from glycolysis and Krebs cycle)</li>
-                    <li><strong>Complex II</strong> accepts FADH₂ (from Krebs cycle)</li>
-                    <li><strong>Complex III</strong> passes electrons through cytochromes</li>
-                    <li><strong>Complex IV</strong> requires O₂ as the final electron acceptor</li>
-                    <li><strong>Complex V</strong> uses H⁺ (protons) to synthesize ATP</li>
-                    <li>Match all molecules correctly to complete the puzzle!</li>
-                </ul>
-
-                <h3>📚 What You'll Learn</h3>
-                <p>Leigh Syndrome most commonly affects <strong>Complex IV</strong>. When this complex fails,
-                   electrons can't reach oxygen, the entire electron transport chain backs up, and ATP production
-                   stops - even though all other complexes might be working fine!</p>
-            `
+        {
+            name: "Breakfast Decision",
+            description: "Mom made breakfast, but climbing down the stairs will use energy.",
+            choices: [
+                { text: "Skip breakfast to save energy", energy: 0, thought: "But now I won't have any fuel... this is a lose-lose situation." },
+                { text: "Go downstairs for breakfast", energy: -18, thought: "The stairs are getting harder every day. But I need to eat." }
+            ]
+        },
+        {
+            name: "Prepare for School",
+            description: "You need to pack your bag and get ready to leave.",
+            choices: [
+                { text: "Pack everything you might need", energy: -20, thought: "My backpack feels like it weighs a ton..." },
+                { text: "Pack only essentials", energy: -10, thought: "I'll have to make do with less. Every ounce matters." }
+            ]
+        },
+        {
+            name: "Getting to School",
+            description: "Time to head to school. It's only 8:00 AM and you're already exhausted.",
+            choices: [
+                { text: "Walk to school", energy: -35, thought: "I don't think I can make it... everything is spinning..." },
+                { text: "Ask mom for a ride", energy: -5, thought: "I hate feeling dependent, but I have to save energy for classes." }
+            ]
         }
-    };
+    ]
+};
 
-    const tutorial = tutorials[gameType];
-    document.getElementById('tutorial-title').textContent = tutorial.title;
-    document.getElementById('tutorial-content').innerHTML = tutorial.content;
-    showScreen('tutorial-screen');
+function initChapter1() {
+    chapter1.energy = 100;
+    chapter1.taskIndex = 0;
+    updateChapter1UI();
+    presentChapter1Task();
+}
+
+function presentChapter1Task() {
+    if (chapter1.taskIndex >= chapter1.tasks.length) {
+        completeChapter1();
+        return;
+    }
+
+    const task = chapter1.tasks[chapter1.taskIndex];
+    document.getElementById('current-activity').textContent = task.name;
+    document.getElementById('activity-description').textContent = task.description;
+
+    const choicesContainer = document.getElementById('activity-choices');
+    choicesContainer.innerHTML = '';
+
+    task.choices.forEach((choice, index) => {
+        const button = document.createElement('button');
+        button.className = 'choice-btn';
+        button.textContent = choice.text + ` (${choice.energy} energy)`;
+        button.onclick = () => makeChapter1Choice(index);
+        choicesContainer.appendChild(button);
+    });
+}
+
+function makeChapter1Choice(choiceIndex) {
+    const task = chapter1.tasks[chapter1.taskIndex];
+    const choice = task.choices[choiceIndex];
+
+    chapter1.energy = Math.max(0, chapter1.energy + choice.energy);
+    document.getElementById('maya-thoughts').textContent = choice.thought;
+
+    updateChapter1UI();
+
+    if (chapter1.energy <= 0) {
+        // Energy depleted
+        setTimeout(() => {
+            alert("You've run out of energy before even getting to school...\n\nThis is the reality for people with Leigh Syndrome - simple morning tasks can be overwhelming.");
+            initChapter1(); // Restart
+        }, 2000);
+        return;
+    }
+
+    // Move to next task
+    chapter1.taskIndex++;
+    setTimeout(presentChapter1Task, 2000);
+}
+
+function updateChapter1UI() {
+    const energy = chapter1.energy;
+    const bar = document.getElementById('maya-energy-bar');
+    const value = document.getElementById('maya-energy');
+    const status = document.getElementById('energy-status-text');
+
+    bar.style.width = energy + '%';
+    value.textContent = energy;
+
+    bar.classList.remove('low', 'critical');
+    if (energy < 30) {
+        bar.classList.add('critical');
+        status.textContent = "Extremely exhausted... can barely move...";
+    } else if (energy < 60) {
+        bar.classList.add('low');
+        status.textContent = "Getting very tired...";
+    } else {
+        status.textContent = "Feeling okay... for now.";
+    }
+}
+
+function completeChapter1() {
+    storyProgress.chapter1Complete = true;
+    document.getElementById('maya-thoughts').textContent =
+        `I made it to school with ${chapter1.energy} energy left. Most students arrive at 100%. This is my normal.`;
+
+    setTimeout(() => {
+        if (confirm("Chapter 1 Complete!\n\nYou experienced a morning in Maya's life.\n\nReady to see what's happening inside her cells?\n\n(Click OK to continue to Chapter 2)")) {
+            startChapter(2);
+        } else {
+            returnToMenu();
+        }
+    }, 3000);
 }
 
 // ==========================================
-// GAME 1: MITOCHONDRIA DEFENSE
+// CHAPTER 2: INSIDE THE CELL
 // ==========================================
 
-let defenseGame = {
+let chapter2 = {
     canvas: null,
     ctx: null,
-    items: [],
-    atp: 100,
-    score: 0,
+    particles: [],
+    atp: 0,
     timeLeft: 60,
     gameActive: false,
     animationId: null,
     timerInterval: null,
-    spawnInterval: null,
-    itemTypes: {
-        glucose: { color: '#00ff00', points: 10, atpChange: 15, label: 'Glucose', good: true },
-        oxygen: { color: '#00ffff', points: 10, atpChange: 15, label: 'O₂', good: true },
-        cyanide: { color: '#ff0000', points: -20, atpChange: -25, label: 'Cyanide', good: false },
-        mutation: { color: '#ff00ff', points: -15, atpChange: -20, label: 'Mutation', good: false }
-    }
+    spawnInterval: null
 };
 
-function initDefenseGame() {
-    defenseGame.canvas = document.getElementById('defense-canvas');
-    defenseGame.ctx = defenseGame.canvas.getContext('2d');
-    defenseGame.items = [];
-    defenseGame.atp = 100;
-    defenseGame.score = 0;
-    defenseGame.timeLeft = 60;
-    defenseGame.gameActive = true;
+function initChapter2() {
+    chapter2.canvas = document.getElementById('cell-canvas');
+    chapter2.ctx = chapter2.canvas.getContext('2d');
+    chapter2.particles = [];
+    chapter2.atp = 0;
+    chapter2.timeLeft = 60;
+    chapter2.gameActive = true;
 
-    updateDefenseUI();
+    updateChapter2UI();
 
-    // Add click listener
-    defenseGame.canvas.addEventListener('click', handleDefenseClick);
-
-    // Start game loops
-    defenseGame.animationId = requestAnimationFrame(updateDefenseGame);
-    defenseGame.timerInterval = setInterval(updateDefenseTimer, 1000);
-    defenseGame.spawnInterval = setInterval(spawnDefenseItem, 1000);
-
-    document.getElementById('defense-status').textContent = 'Collect nutrients! Avoid toxins!';
-    document.getElementById('defense-status').className = 'status-message info';
+    chapter2.canvas.addEventListener('click', handleCellClick);
+    chapter2.animationId = requestAnimationFrame(updateCellGame);
+    chapter2.timerInterval = setInterval(updateCellTimer, 1000);
+    chapter2.spawnInterval = setInterval(spawnCellParticle, 800);
 }
 
-function spawnDefenseItem() {
-    if (!defenseGame.gameActive) return;
+function spawnCellParticle() {
+    if (!chapter2.gameActive) return;
 
-    const types = Object.keys(defenseGame.itemTypes);
-    const randomType = types[Math.floor(Math.random() * types.length)];
-    const itemData = defenseGame.itemTypes[randomType];
+    const types = [
+        { name: 'Glucose', color: '#00ff00', good: true, atp: 2 },
+        { name: 'O₂', color: '#00ffff', good: true, atp: 2 },
+        { name: 'Mutation', color: '#ff0000', good: false, atp: -3 },
+        { name: 'Toxin', color: '#ff6600', good: false, atp: -2 }
+    ];
 
-    const item = {
-        type: randomType,
-        x: Math.random() * (defenseGame.canvas.width - 60) + 30,
+    const type = types[Math.floor(Math.random() * types.length)];
+
+    const particle = {
+        x: Math.random() * (chapter2.canvas.width - 40) + 20,
         y: -30,
-        speed: 1 + Math.random() * 2,
-        radius: 25,
-        data: itemData
+        speed: 1 + Math.random() * 1.5,
+        radius: 20,
+        ...type
     };
 
-    defenseGame.items.push(item);
+    chapter2.particles.push(particle);
 }
 
-function updateDefenseGame() {
-    if (!defenseGame.gameActive) return;
+function updateCellGame() {
+    if (!chapter2.gameActive) return;
 
-    const ctx = defenseGame.ctx;
-    const canvas = defenseGame.canvas;
+    const ctx = chapter2.ctx;
+    const canvas = chapter2.canvas;
 
-    // Clear canvas
-    ctx.fillStyle = '#1a1a2e';
+    // Background
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#1a1a2e');
+    gradient.addColorStop(1, '#16213e');
+    ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    // Update and draw items
-    defenseGame.items = defenseGame.items.filter(item => {
-        item.y += item.speed;
+    // Draw mitochondria outline
+    ctx.strokeStyle = '#764ba2';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.ellipse(canvas.width/2, canvas.height/2, 300, 150, 0, 0, Math.PI * 2);
+    ctx.stroke();
 
-        // Remove items that fell off screen
-        if (item.y > canvas.height + 50) {
-            return false;
-        }
+    ctx.fillStyle = 'rgba(118, 75, 162, 0.1)';
+    ctx.fill();
 
-        // Draw item
+    // Draw particles
+    chapter2.particles = chapter2.particles.filter(p => {
+        p.y += p.speed;
+
+        if (p.y > canvas.height + 50) return false;
+
+        // Draw particle
         ctx.beginPath();
-        ctx.arc(item.x, item.y, item.radius, 0, Math.PI * 2);
-        ctx.fillStyle = item.data.color;
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
         ctx.fill();
-        ctx.strokeStyle = '#ffffff';
+        ctx.strokeStyle = '#fff';
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        // Draw label
-        ctx.fillStyle = '#ffffff';
+        // Label
+        ctx.fillStyle = '#fff';
         ctx.font = 'bold 12px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText(item.data.label, item.x, item.y + 5);
+        ctx.fillText(p.name, p.x, p.y + 5);
 
         return true;
     });
 
-    // Passive ATP drain
-    if (Math.random() < 0.01) {
-        defenseGame.atp = Math.max(0, defenseGame.atp - 1);
-        updateDefenseUI();
-    }
-
-    // Check game over
-    if (defenseGame.atp <= 0) {
-        gameOverDefense(false);
-    }
-
-    defenseGame.animationId = requestAnimationFrame(updateDefenseGame);
+    chapter2.animationId = requestAnimationFrame(updateCellGame);
 }
 
-function handleDefenseClick(event) {
-    if (!defenseGame.gameActive) return;
+function handleCellClick(event) {
+    if (!chapter2.gameActive) return;
 
-    const rect = defenseGame.canvas.getBoundingClientRect();
-    const scaleX = defenseGame.canvas.width / rect.width;
-    const scaleY = defenseGame.canvas.height / rect.height;
+    const rect = chapter2.canvas.getBoundingClientRect();
+    const scaleX = chapter2.canvas.width / rect.width;
+    const scaleY = chapter2.canvas.height / rect.height;
     const clickX = (event.clientX - rect.left) * scaleX;
     const clickY = (event.clientY - rect.top) * scaleY;
 
-    // Check if clicked on any item
-    for (let i = defenseGame.items.length - 1; i >= 0; i--) {
-        const item = defenseGame.items[i];
-        const distance = Math.sqrt(
-            Math.pow(clickX - item.x, 2) + Math.pow(clickY - item.y, 2)
-        );
+    for (let i = chapter2.particles.length - 1; i >= 0; i--) {
+        const p = chapter2.particles[i];
+        const dist = Math.sqrt((clickX - p.x) ** 2 + (clickY - p.y) ** 2);
 
-        if (distance <= item.radius) {
-            // Hit!
-            defenseGame.score += item.data.points;
-            defenseGame.atp = Math.min(100, Math.max(0, defenseGame.atp + item.data.atpChange));
+        if (dist <= p.radius) {
+            chapter2.atp += p.atp;
+            chapter2.particles.splice(i, 1);
+            updateChapter2UI();
 
-            // Show feedback
-            const status = document.getElementById('defense-status');
-            if (item.data.good) {
-                status.textContent = `+${item.data.atpChange} ATP! Collected ${item.data.label}`;
-                status.className = 'status-message success';
+            const status = document.getElementById('cell-status');
+            if (p.good) {
+                status.textContent = 'Working';
+                status.style.color = '#22c55e';
             } else {
-                status.textContent = `${item.data.atpChange} ATP! Hit ${item.data.label}!`;
-                status.className = 'status-message error';
+                status.textContent = 'Damaged!';
+                status.style.color = '#ef4444';
             }
-
-            // Remove item
-            defenseGame.items.splice(i, 1);
-            updateDefenseUI();
             break;
         }
     }
 }
 
-function updateDefenseTimer() {
-    if (!defenseGame.gameActive) return;
+function updateCellTimer() {
+    if (!chapter2.gameActive) return;
+    chapter2.timeLeft--;
+    updateChapter2UI();
 
-    defenseGame.timeLeft--;
-    updateDefenseUI();
-
-    if (defenseGame.timeLeft <= 0) {
-        gameOverDefense(true);
+    if (chapter2.timeLeft <= 0) {
+        completeChapter2();
     }
 }
 
-function updateDefenseUI() {
-    document.getElementById('defense-atp').textContent = Math.round(defenseGame.atp);
-    document.getElementById('defense-score').textContent = defenseGame.score;
-    document.getElementById('defense-time').textContent = defenseGame.timeLeft;
+function updateChapter2UI() {
+    document.getElementById('atp-produced').textContent = chapter2.atp;
+    document.getElementById('cell-timer').textContent = chapter2.timeLeft + 's';
 }
 
-function stopDefenseGame() {
-    defenseGame.gameActive = false;
-    if (defenseGame.animationId) {
-        cancelAnimationFrame(defenseGame.animationId);
-    }
-    if (defenseGame.timerInterval) {
-        clearInterval(defenseGame.timerInterval);
-    }
-    if (defenseGame.spawnInterval) {
-        clearInterval(defenseGame.spawnInterval);
-    }
-}
+function completeChapter2() {
+    chapter2.gameActive = false;
+    clearInterval(chapter2.timerInterval);
+    clearInterval(chapter2.spawnInterval);
+    cancelAnimationFrame(chapter2.animationId);
 
-function gameOverDefense(won) {
-    stopDefenseGame();
+    const message = chapter2.atp < 30
+        ? `You produced only ${chapter2.atp} ATP in 60 seconds.\n\nHealthy mitochondria produce hundreds of ATP per second.\n\nThis is why Maya is always exhausted - her cells are starving for energy.`
+        : `You produced ${chapter2.atp} ATP - better than Maya's cells usually do!\n\nBut even this is far below what healthy mitochondria produce.\n\nLet's see what the doctor says about this...`;
 
-    const title = won ? '🎉 Neuron Survived!' : '💔 Neuron Failed';
-    const content = won
-        ? `<p><strong>Congratulations!</strong> You successfully maintained ATP production for 60 seconds.</p>
-           <p>Final Score: <strong>${defenseGame.score}</strong></p>
-           <p>Final ATP: <strong>${Math.round(defenseGame.atp)}</strong></p>
-           <div class="info-box">
-               <p>In healthy cells, mitochondria constantly produce ATP by processing glucose and oxygen.
-                  In Leigh Syndrome, mutations prevent this process, causing severe energy deficiency
-                  in high-energy organs like the brain.</p>
-           </div>`
-        : `<p><strong>ATP Depleted!</strong> The neuron has run out of energy.</p>
-           <p>Final Score: <strong>${defenseGame.score}</strong></p>
-           <div class="info-box">
-               <p><strong>Leigh Syndrome Symptoms Appear:</strong></p>
-               <ul>
-                   <li>Muscle weakness and poor muscle tone</li>
-                   <li>Loss of motor skills</li>
-                   <li>Difficulty breathing</li>
-                   <li>Seizures and neurological problems</li>
-               </ul>
-               <p>This is what happens when mitochondria can't produce enough ATP to meet the body's needs.</p>
-           </div>`;
-
-    document.getElementById('gameover-title').textContent = title;
-    document.getElementById('gameover-content').innerHTML = content;
-    showScreen('gameover-screen');
+    setTimeout(() => {
+        if (confirm(message + "\n\nContinue to Chapter 3?")) {
+            startChapter(3);
+        } else {
+            returnToMenu();
+        }
+    }, 1500);
 }
 
 // ==========================================
-// GAME 2: ENERGY METER CHALLENGE
+// CHAPTER 3: THE DOCTOR VISIT
 // ==========================================
 
-let energyGame = {
-    atp: 100,
-    maxAtp: 100,
-    tasksCompleted: 0,
-    round: 1,
-    currentTask: null,
-    mutated: false,
-    gameActive: false,
-    regenInterval: null,
-    tasks: [
-        { name: 'Walk across the room', cost: 15 },
-        { name: 'Breathe deeply', cost: 10 },
-        { name: 'Think and solve a problem', cost: 12 },
-        { name: 'Pick up an object', cost: 8 },
-        { name: 'Speak a sentence', cost: 7 },
-        { name: 'Stand up from sitting', cost: 13 },
-        { name: 'Climb a few stairs', cost: 20 },
-        { name: 'Write your name', cost: 11 },
-        { name: 'Chew and swallow food', cost: 9 },
-        { name: 'Focus your eyes', cost: 6 }
+const doctorDialogues = [
+    {
+        doctor: "Maya, I want to explain what's happening in your cells. Your genetic test results show a mutation in the gene for Complex IV of the electron transport chain.",
+        maya: "Complex IV? What does that mean?",
+        diagram: true
+    },
+    {
+        doctor: "Let me show you. Your cells have tiny structures called mitochondria. Inside them, there are 5 complexes that work together to produce ATP - the energy molecule.",
+        maya: "And one of mine is broken?",
+        diagram: true
+    },
+    {
+        doctor: "Yes. Complex IV is supposed to take electrons and combine them with oxygen to make water. But your mutation means it can't do this efficiently.",
+        maya: "So what happens to the electrons?",
+        diagram: true
+    },
+    {
+        doctor: "They get stuck. The whole chain backs up. It's like a traffic jam - even though Complexes I, II, III, and V might be working fine, they can't do their jobs if Complex IV is blocked.",
+        maya: "That's why I'm always tired... my cells can't make enough energy.",
+        diagram: true
+    },
+    {
+        doctor: "Exactly. And your brain and muscles need the most energy, which is why Leigh Syndrome affects them the most. But understanding this helps us manage your symptoms better.",
+        maya: "I understand now. Thank you, Dr. Martinez.",
+        diagram: true
+    }
+];
+
+let doctorDialogueIndex = 0;
+
+function initChapter3() {
+    doctorDialogueIndex = 0;
+    showDoctorDialogue();
+}
+
+function showDoctorDialogue() {
+    if (doctorDialogueIndex >= doctorDialogues.length) {
+        completeChapter3();
+        return;
+    }
+
+    const dialogue = doctorDialogues[doctorDialogueIndex];
+    document.getElementById('doctor-dialogue').textContent = dialogue.doctor;
+    document.getElementById('maya-response').textContent = dialogue.maya || "";
+
+    if (dialogue.diagram) {
+        document.getElementById('diagram-area').innerHTML = `
+            <div style="background: #f8f9ff; padding: 20px; border-radius: 10px; margin: 20px 0;">
+                <p style="text-align: center; color: #667eea; font-weight: bold;">
+                    [Electron Transport Chain Diagram]<br>
+                    Complex I → Complex II → Complex III → <span style="color: #ef4444;">Complex IV (MUTATED)</span> → Complex V<br>
+                    <span style="color: #ef4444;">⚠️ Electrons can't flow properly!</span>
+                </p>
+            </div>
+        `;
+    }
+}
+
+function nextDoctorDialogue() {
+    doctorDialogueIndex++;
+    showDoctorDialogue();
+}
+
+function completeChapter3() {
+    if (confirm("Chapter 3 Complete!\n\nYou now understand the science behind Maya's condition.\n\nReady to experience a day at school?\n\n(Chapter 4)")) {
+        startChapter(4);
+    } else {
+        returnToMenu();
+    }
+}
+
+// ==========================================
+// CHAPTER 4: SCHOOL DAY
+// ==========================================
+
+let chapter4 = {
+    energy: 80,
+    scenarioIndex: 0,
+    time: "8:00 AM",
+    scenarios: [
+        {
+            time: "8:00 AM",
+            period: "First Period - Math",
+            title: "First Class",
+            description: "You made it to school but already used energy this morning. Math class requires concentration.",
+            choices: [
+                { text: "Focus intensely on the lesson", energy: -25, consequence: "You understand the material but feel dizzy from the effort." },
+                { text: "Take notes slowly, rest between problems", energy: -15, consequence: "You miss some details but conserve energy for later." }
+            ]
+        },
+        {
+            time: "9:30 AM",
+            period: "Passing Period",
+            title: "Changing Classes",
+            description: "You need to walk to your next class across the building.",
+            choices: [
+                { text: "Walk quickly to get a good seat", energy: -20, consequence: "You're out of breath and your muscles are burning." },
+                { text: "Walk slowly, arrive a bit late", energy: -10, consequence: "You conserve energy but feel embarrassed arriving late." }
+            ]
+        },
+        {
+            time: "10:00 AM",
+            period: "PE Class",
+            title: "Physical Education",
+            description: "PE class. The teacher wants everyone to run laps.",
+            choices: [
+                { text: "Try to participate", energy: -40, consequence: "You collapse after one lap. The nurse is called. This was too much." },
+                { text: "Sit out with doctor's note", energy: -5, consequence: "You watch from the sidelines. Some students whisper and stare." }
+            ]
+        },
+        {
+            time: "11:30 AM",
+            period: "Lunch",
+            title: "Lunchtime Decision",
+            description: "Lunch break. You're exhausted but need to eat.",
+            choices: [
+                { text: "Get lunch from cafeteria", energy: -15, consequence: "Standing in line is exhausting, but you get food." },
+                { text: "Skip lunch to rest", energy: +10, consequence: "You rest, but now you're hungry and have no fuel for afternoon classes." }
+            ]
+        },
+        {
+            time: "1:00 PM",
+            period: "Afternoon Classes",
+            title: "Final Period",
+            description: "Last class of the day. You're running on empty.",
+            choices: [
+                { text: "Push through to the end", energy: -20, consequence: "You make it, but barely. Everything hurts." },
+                { text: "Call mom to pick you up early", energy: 0, consequence: "You leave early. You're safe, but feel defeated." }
+            ]
+        }
     ]
 };
 
-function startEnergyGame() {
-    energyGame.gameActive = true;
-    energyGame.atp = 100;
-    energyGame.tasksCompleted = 0;
-    energyGame.round = 1;
-    energyGame.mutated = false;
-
-    updateEnergyUI();
-    presentTask();
-
-    // Start ATP regeneration
-    energyGame.regenInterval = setInterval(regenerateATP, 500);
-
-    document.getElementById('start-energy-btn').disabled = true;
+function initChapter4() {
+    chapter4.energy = 80;
+    chapter4.scenarioIndex = 0;
+    updateChapter4UI();
+    presentSchoolScenario();
 }
 
-function regenerateATP() {
-    if (!energyGame.gameActive) return;
-
-    const regenRate = energyGame.mutated ? 1 : 5; // Much slower regen after mutation
-    energyGame.atp = Math.min(energyGame.maxAtp, energyGame.atp + regenRate);
-    updateEnergyUI();
-}
-
-function presentTask() {
-    if (!energyGame.gameActive) return;
-
-    const randomTask = energyGame.tasks[Math.floor(Math.random() * energyGame.tasks.length)];
-    energyGame.currentTask = randomTask;
-
-    document.getElementById('current-task').textContent = `Task: ${randomTask.name}`;
-    document.getElementById('task-buttons').innerHTML = `
-        <button class="task-btn" onclick="performTask()">
-            Perform Task (${randomTask.cost} ATP)
-        </button>
-    `;
-
-    // Check for mutation trigger
-    if (energyGame.round === 4 && !energyGame.mutated) {
-        triggerMutation();
-    }
-}
-
-function performTask() {
-    if (!energyGame.gameActive || !energyGame.currentTask) return;
-
-    const cost = energyGame.currentTask.cost;
-
-    if (energyGame.atp >= cost) {
-        energyGame.atp -= cost;
-        energyGame.tasksCompleted++;
-
-        if (energyGame.tasksCompleted % 5 === 0) {
-            energyGame.round++;
-        }
-
-        updateEnergyUI();
-
-        if (energyGame.mutated) {
-            document.getElementById('energy-status').textContent =
-                `Task completed, but ATP regeneration is severely impaired! Tasks: ${energyGame.tasksCompleted}`;
-            document.getElementById('energy-status').className = 'status-message warning';
-        } else {
-            document.getElementById('energy-status').textContent =
-                `Task completed! ATP regenerating normally. Tasks: ${energyGame.tasksCompleted}`;
-            document.getElementById('energy-status').className = 'status-message success';
-        }
-
-        setTimeout(presentTask, 1500);
-    } else {
-        document.getElementById('energy-status').textContent =
-            'Not enough ATP! Wait for regeneration...';
-        document.getElementById('energy-status').className = 'status-message error';
+function presentSchoolScenario() {
+    if (chapter4.scenarioIndex >= chapter4.scenarios.length) {
+        completeChapter4();
+        return;
     }
 
-    if (energyGame.atp <= 0) {
-        gameOverEnergy();
+    const scenario = chapter4.scenarios[chapter4.scenarioIndex];
+    document.getElementById('school-time').textContent = scenario.time;
+    document.getElementById('school-period').textContent = scenario.period;
+    document.getElementById('scenario-title').textContent = scenario.title;
+    document.getElementById('scenario-desc').textContent = scenario.description;
+
+    const choicesContainer = document.getElementById('scenario-choices');
+    choicesContainer.innerHTML = '';
+
+    scenario.choices.forEach((choice, index) => {
+        const button = document.createElement('button');
+        button.className = 'choice-btn';
+        button.textContent = choice.text;
+        button.onclick = () => makeSchoolChoice(index);
+        choicesContainer.appendChild(button);
+    });
+
+    document.getElementById('consequence-display').textContent = '';
+}
+
+function makeSchoolChoice(choiceIndex) {
+    const scenario = chapter4.scenarios[chapter4.scenarioIndex];
+    const choice = scenario.choices[choiceIndex];
+
+    chapter4.energy = Math.max(0, Math.min(100, chapter4.energy + choice.energy));
+    document.getElementById('consequence-display').textContent = choice.consequence;
+
+    updateChapter4UI();
+
+    if (chapter4.energy <= 0) {
+        setTimeout(() => {
+            alert("Energy completely depleted.\n\nYou had to go home early. This happens to Maya several times a month.");
+            initChapter4();
+        }, 2000);
+        return;
     }
+
+    chapter4.scenarioIndex++;
+    setTimeout(presentSchoolScenario, 3000);
 }
 
-function triggerMutation() {
-    energyGame.mutated = true;
+function updateChapter4UI() {
+    const energy = chapter4.energy;
+    const bar = document.getElementById('school-energy-bar');
+    const value = document.getElementById('school-energy');
 
-    document.getElementById('energy-status').innerHTML =
-        `<strong>⚠️ MUTATION OCCURRED!</strong> Mitochondrial Complex IV damaged! ATP regeneration severely reduced!`;
-    document.getElementById('energy-status').className = 'status-message error';
+    bar.style.width = energy + '%';
+    value.textContent = energy;
 
-    // Visual effect on meter
-    document.getElementById('atp-bar').style.animation = 'pulse 0.5s 3';
-}
-
-function updateEnergyUI() {
-    const percentage = (energyGame.atp / energyGame.maxAtp) * 100;
-    const bar = document.getElementById('atp-bar');
-
-    bar.style.width = percentage + '%';
-
-    // Color coding
     bar.classList.remove('low', 'critical');
-    if (percentage < 30) {
+    if (energy < 30) {
         bar.classList.add('critical');
-    } else if (percentage < 60) {
+    } else if (energy < 60) {
         bar.classList.add('low');
     }
-
-    document.getElementById('atp-value').textContent =
-        `${Math.round(energyGame.atp)} / ${energyGame.maxAtp}`;
-    document.getElementById('energy-tasks').textContent = energyGame.tasksCompleted;
-    document.getElementById('energy-round').textContent = energyGame.round;
 }
 
-function stopEnergyGame() {
-    energyGame.gameActive = false;
-    if (energyGame.regenInterval) {
-        clearInterval(energyGame.regenInterval);
-    }
-}
+function completeChapter4() {
+    const message = chapter4.energy > 40
+        ? `You made it through the school day with ${chapter4.energy} energy remaining!\n\nMost students finish the day at 70-80% energy.\n\nFor Maya, just surviving school is an achievement.`
+        : `You barely made it through the school day...\n\nRemaining energy: ${chapter4.energy}\n\nAnd Maya still has homework, dinner, and basic self-care to do tonight.`;
 
-function resetEnergyGame() {
-    stopEnergyGame();
-    energyGame.atp = 100;
-    energyGame.tasksCompleted = 0;
-    energyGame.round = 1;
-    energyGame.mutated = false;
-    updateEnergyUI();
-    document.getElementById('current-task').textContent = 'Click Start to Begin';
-    document.getElementById('task-buttons').innerHTML = '';
-    document.getElementById('energy-status').textContent = '';
-    document.getElementById('start-energy-btn').disabled = false;
-}
-
-function gameOverEnergy() {
-    stopEnergyGame();
-
-    const content = `
-        <p><strong>ATP Depleted!</strong> Energy crisis has occurred.</p>
-        <p>Tasks Completed: <strong>${energyGame.tasksCompleted}</strong></p>
-        <p>Rounds Survived: <strong>${energyGame.round}</strong></p>
-        <div class="info-box">
-            <p><strong>What happened?</strong></p>
-            <p>After the mutation occurred in round 4, your mitochondria could barely regenerate ATP.
-               Even simple tasks became impossible to perform - just like in Leigh Syndrome patients.</p>
-            <p><strong>Leigh Syndrome Impact:</strong> Patients experience extreme fatigue and weakness
-               because their cells cannot produce enough ATP to meet basic energy demands. Simple activities
-               that healthy people take for granted become exhausting or impossible.</p>
-        </div>
-    `;
-
-    document.getElementById('gameover-title').textContent = '💔 Energy Crisis';
-    document.getElementById('gameover-content').innerHTML = content;
-    showScreen('gameover-screen');
+    setTimeout(() => {
+        if (confirm(message + "\n\nReady to learn more about the Electron Transport Chain?\n\n(Chapter 5)")) {
+            startChapter(5);
+        } else {
+            returnToMenu();
+        }
+    }, 2000);
 }
 
 // ==========================================
-// GAME 3: PATHWAY PUZZLE - ETC
+// CHAPTER 5: ETC INTERACTIVE
 // ==========================================
 
-let pathwayGame = {
+let chapter5 = {
     correctPlacements: 0,
-    mistakes: 0,
     molecules: ['NADH', 'FADH2', 'Electron', 'O2', 'H+'],
     draggedElement: null
 };
 
-function initPathwayGame() {
-    pathwayGame.correctPlacements = 0;
-    pathwayGame.mistakes = 0;
-    updatePathwayUI();
+function initChapter5() {
+    chapter5.correctPlacements = 0;
     createMolecules();
     setupDragAndDrop();
 }
 
 function createMolecules() {
-    const container = document.getElementById('molecules-container');
+    const container = document.getElementById('etc-molecules');
     container.innerHTML = '';
 
-    pathwayGame.molecules.forEach(molecule => {
+    chapter5.molecules.forEach(molecule => {
         const div = document.createElement('div');
         div.className = 'molecule';
         div.draggable = true;
         div.dataset.molecule = molecule;
 
-        // Display formatting
         let display = molecule;
         if (molecule === 'FADH2') display = 'FADH₂';
         if (molecule === 'O2') display = 'O₂';
@@ -571,14 +657,13 @@ function createMolecules() {
 }
 
 function setupDragAndDrop() {
-    // Drag start
     document.querySelectorAll('.molecule').forEach(molecule => {
         molecule.addEventListener('dragstart', (e) => {
             if (molecule.classList.contains('placed')) {
                 e.preventDefault();
                 return;
             }
-            pathwayGame.draggedElement = e.target;
+            chapter5.draggedElement = e.target;
             e.target.classList.add('dragging');
         });
 
@@ -587,7 +672,6 @@ function setupDragAndDrop() {
         });
     });
 
-    // Drop zones
     document.querySelectorAll('.drop-zone').forEach(zone => {
         zone.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -596,7 +680,7 @@ function setupDragAndDrop() {
             }
         });
 
-        zone.addEventListener('dragleave', (e) => {
+        zone.addEventListener('dragleave', () => {
             zone.classList.remove('drag-over');
         });
 
@@ -604,114 +688,71 @@ function setupDragAndDrop() {
             e.preventDefault();
             zone.classList.remove('drag-over');
 
-            if (zone.classList.contains('filled') || !pathwayGame.draggedElement) {
-                return;
-            }
+            if (zone.classList.contains('filled') || !chapter5.draggedElement) return;
 
-            const moleculeType = pathwayGame.draggedElement.dataset.molecule;
+            const moleculeType = chapter5.draggedElement.dataset.molecule;
             const acceptedType = zone.dataset.accepts;
 
             if (moleculeType === acceptedType) {
-                // Correct placement!
                 let display = moleculeType;
                 if (moleculeType === 'FADH2') display = 'FADH₂';
                 if (moleculeType === 'O2') display = 'O₂';
                 if (moleculeType === 'H+') display = 'H⁺';
 
-                zone.innerHTML = `<div class="molecule" style="cursor: default;">${display}</div>`;
+                zone.innerHTML = `<div class="molecule" style="cursor: default; margin: 0;">${display}</div>`;
                 zone.classList.add('filled');
-                pathwayGame.draggedElement.classList.add('placed');
-                pathwayGame.correctPlacements++;
+                chapter5.draggedElement.classList.add('placed');
+                chapter5.correctPlacements++;
 
-                document.getElementById('pathway-status').textContent =
-                    `✓ Correct! ${display} belongs in this complex!`;
-                document.getElementById('pathway-status').className = 'status-message success';
-
-                updatePathwayUI();
-
-                // Check if puzzle complete
-                if (pathwayGame.correctPlacements === 5) {
-                    completePuzzle();
+                if (chapter5.correctPlacements === 5) {
+                    setTimeout(completeChapter5, 1000);
                 }
             } else {
-                // Wrong placement
                 zone.classList.add('error');
                 setTimeout(() => zone.classList.remove('error'), 300);
-                pathwayGame.mistakes++;
-
-                document.getElementById('pathway-status').textContent =
-                    `✗ Incorrect! This molecule doesn't belong in this complex.`;
-                document.getElementById('pathway-status').className = 'status-message error';
-
-                updatePathwayUI();
             }
 
-            pathwayGame.draggedElement = null;
+            chapter5.draggedElement = null;
         });
     });
 }
 
-function updatePathwayUI() {
-    document.getElementById('pathway-correct').textContent = pathwayGame.correctPlacements;
-    document.getElementById('pathway-mistakes').textContent = pathwayGame.mistakes;
-}
-
-function resetPathwayGame() {
-    // Clear all drop zones
+function resetETC() {
     document.querySelectorAll('.drop-zone').forEach(zone => {
         zone.innerHTML = '';
         zone.classList.remove('filled', 'drag-over', 'error');
     });
 
-    // Reset molecules
     document.querySelectorAll('.molecule').forEach(molecule => {
         molecule.classList.remove('placed', 'dragging');
     });
 
-    pathwayGame.correctPlacements = 0;
-    pathwayGame.mistakes = 0;
-    updatePathwayUI();
-
-    document.getElementById('pathway-status').textContent = '';
-    document.getElementById('pathway-status').className = 'status-message';
+    chapter5.correctPlacements = 0;
+    document.getElementById('etc-results').textContent = '';
 }
 
-function completePuzzle() {
-    const content = `
-        <p><strong>🎉 Puzzle Complete!</strong> You've successfully assembled the Electron Transport Chain!</p>
-        <p>Correct Placements: <strong>5/5</strong></p>
-        <p>Mistakes: <strong>${pathwayGame.mistakes}</strong></p>
-
-        <div class="info-box">
-            <h3>How the ETC Produces ATP:</h3>
-            <ol>
-                <li><strong>Complex I & II:</strong> Accept electrons from NADH and FADH₂</li>
-                <li><strong>Complex III:</strong> Electrons move through cytochromes</li>
-                <li><strong>Complex IV:</strong> Electrons combine with O₂ (oxygen) and H⁺ to form water</li>
-                <li><strong>Proton Pumping:</strong> As electrons move, H⁺ ions are pumped across the membrane</li>
-                <li><strong>Complex V (ATP Synthase):</strong> H⁺ flows back through, driving ATP production</li>
-            </ol>
-        </div>
-
-        <div class="info-box" style="background: #fff3cd; border-left-color: #ffc107;">
-            <h3>⚠️ Leigh Syndrome & Complex IV</h3>
-            <p>Most cases of Leigh Syndrome involve mutations in <strong>Complex IV (Cytochrome c Oxidase)</strong>.
-               When Complex IV can't accept electrons, the entire chain backs up and stops working.</p>
-            <p>Without a functioning ETC, cells can't produce enough ATP. This is especially devastating for
-               high-energy organs like the brain, causing the severe neurological symptoms of Leigh Syndrome.</p>
+function completeChapter5() {
+    document.getElementById('etc-results').innerHTML = `
+        <div style="background: #d1fae5; padding: 20px; border-radius: 10px; border-left: 4px solid #22c55e;">
+            <strong>🎉 Perfect! You've completed the Electron Transport Chain!</strong>
+            <p style="margin-top: 10px;">In healthy cells, this process produces 32-34 ATP molecules per glucose molecule.</p>
+            <p>But remember: Maya's Complex IV is mutated, so her cells produce far less ATP - causing all the symptoms you experienced in her story.</p>
         </div>
     `;
 
-    document.getElementById('gameover-title').textContent = '🧬 ETC Complete!';
-    document.getElementById('gameover-content').innerHTML = content;
-    showScreen('gameover-screen');
+    setTimeout(() => {
+        if (confirm("All chapters complete!\n\nYou've experienced Maya's life and learned the science behind Leigh Syndrome.\n\nView Maya's final message?")) {
+            showScreen('story-end');
+        } else {
+            returnToMenu();
+        }
+    }, 3000);
 }
 
 // ==========================================
 // INITIALIZATION
 // ==========================================
 
-// Show main menu on load
 window.addEventListener('load', () => {
     showScreen('main-menu');
 });

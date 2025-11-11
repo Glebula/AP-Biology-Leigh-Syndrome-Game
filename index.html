@@ -3,26 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Leigh Syndrome: Interactive Learning Game</title>
+    <title>Maya's Story: Living with Leigh Syndrome</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Main Menu Screen -->
     <div id="main-menu" class="screen active">
-        <div class="container">
-            <h1>Leigh Syndrome</h1>
-            <h2>Interactive Learning Experience</h2>
-            <div class="info-box">
-                <p><strong>What is Leigh Syndrome?</strong></p>
-                <p>Leigh Syndrome is a rare inherited neurometabolic disorder that affects the central nervous system.
-                   It's caused by mutations in mitochondrial DNA or nuclear DNA that affect mitochondrial function,
-                   leading to progressive loss of mental and movement abilities.</p>
+        <div class="container title-screen">
+            <h1 class="game-title">Maya's Story</h1>
+            <h2 class="subtitle">Living with Leigh Syndrome</h2>
+            <div class="character-intro">
+                <div class="character-portrait">
+                    <div class="avatar maya-avatar">M</div>
+                </div>
+                <p class="intro-text">"Hi, I'm Maya. I'm 16 years old, and I have Leigh Syndrome.
+                   Come experience my world and learn what it's like living with a mitochondrial disease."</p>
             </div>
             <div class="menu-buttons">
-                <button class="menu-btn" onclick="showScreen('about-screen')">📚 Learn About Leigh Syndrome</button>
-                <button class="menu-btn" onclick="startGame('defense')">🎮 Game 1: Mitochondria Defense</button>
-                <button class="menu-btn" onclick="startGame('energy')">⚡ Game 2: Energy Meter Challenge</button>
-                <button class="menu-btn" onclick="startGame('pathway')">🧬 Game 3: Pathway Puzzle - ETC</button>
+                <button class="menu-btn primary-btn" onclick="startStory()">Start Maya's Story</button>
+                <button class="menu-btn" onclick="showScreen('about-screen')">About Leigh Syndrome</button>
+                <button class="menu-btn" onclick="showScreen('chapter-select')">Chapter Select</button>
             </div>
         </div>
     </div>
@@ -32,151 +32,350 @@
         <div class="container">
             <h1>Understanding Leigh Syndrome</h1>
             <div class="info-section">
-                <h3>🧬 The Science</h3>
-                <p>Mitochondria are the "powerhouses" of cells, producing ATP (adenosine triphosphate) through cellular respiration.
-                   In Leigh Syndrome, genetic mutations disrupt the electron transport chain (ETC), severely reducing ATP production.</p>
+                <h3>What is Leigh Syndrome?</h3>
+                <p>Leigh Syndrome is a severe neurological disorder that usually becomes apparent in the first year of life.
+                   It's caused by mutations that affect how mitochondria produce energy (ATP) in cells.</p>
             </div>
             <div class="info-section">
-                <h3>⚠️ Symptoms</h3>
+                <h3>The Biology</h3>
+                <p>Mitochondria are the "powerhouses" of cells. They use oxygen and nutrients to produce ATP through
+                   a process called the Electron Transport Chain (ETC). In Leigh Syndrome, mutations disrupt this process,
+                   causing severe energy deficiency especially in the brain and muscles.</p>
+            </div>
+            <div class="info-section">
+                <h3>Living with Leigh Syndrome</h3>
+                <p>People with Leigh Syndrome experience progressive loss of mental and movement abilities. Simple tasks
+                   that require energy become increasingly difficult. This game helps you understand their daily challenges.</p>
+            </div>
+            <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Chapter Select -->
+    <div id="chapter-select" class="screen">
+        <div class="container">
+            <h1>Select a Chapter</h1>
+            <div class="chapter-list">
+                <div class="chapter-card" onclick="startChapter(1)">
+                    <div class="chapter-number">1</div>
+                    <h3>Maya's Morning</h3>
+                    <p>Help Maya get ready for school while managing her limited energy</p>
+                </div>
+                <div class="chapter-card" onclick="startChapter(2)">
+                    <div class="chapter-number">2</div>
+                    <h3>Inside the Cell</h3>
+                    <p>Experience life as Maya's mitochondria struggling to produce ATP</p>
+                </div>
+                <div class="chapter-card" onclick="startChapter(3)">
+                    <div class="chapter-number">3</div>
+                    <h3>The Doctor Visit</h3>
+                    <p>Learn what's happening at the molecular level</p>
+                </div>
+                <div class="chapter-card" onclick="startChapter(4)">
+                    <div class="chapter-number">4</div>
+                    <h3>A Day at School</h3>
+                    <p>Navigate school challenges with declining energy</p>
+                </div>
+                <div class="chapter-card" onclick="startChapter(5)">
+                    <div class="chapter-number">5</div>
+                    <h3>Understanding My Body</h3>
+                    <p>Interactive journey through the Electron Transport Chain</p>
+                </div>
+            </div>
+            <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Story Intro -->
+    <div id="story-intro" class="screen">
+        <div class="story-container">
+            <div class="dialogue-box">
+                <div class="character-name">Maya</div>
+                <div id="intro-text" class="dialogue-text"></div>
+                <button class="continue-btn" onclick="nextIntroDialogue()">Continue →</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 1: Maya's Morning -->
+    <div id="chapter1" class="screen game-screen">
+        <div class="game-container">
+            <div class="chapter-header">
+                <h2>Chapter 1: Maya's Morning</h2>
+                <div class="story-context">
+                    <p id="chapter1-context">Help Maya complete her morning routine before school</p>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="energy-display">
+                    <h3>Maya's Energy</h3>
+                    <div class="meter-bar large">
+                        <div id="maya-energy-bar" class="meter-fill"></div>
+                    </div>
+                    <div class="energy-value"><span id="maya-energy">100</span> / 100</div>
+                    <p class="energy-status" id="energy-status-text">Feeling okay...</p>
+                </div>
+
+                <div class="task-sequence">
+                    <h3 id="current-activity">Morning Routine</h3>
+                    <div id="activity-description" class="activity-desc"></div>
+                    <div id="activity-choices" class="choice-buttons"></div>
+                </div>
+
+                <div class="dialogue-section">
+                    <div class="dialogue-box mini">
+                        <div class="character-name">Maya</div>
+                        <div id="maya-thoughts" class="dialogue-text">
+                            Another morning... I hope I have enough energy today.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="back-btn" onclick="returnToMenu()">← Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 2: Inside the Cell -->
+    <div id="chapter2" class="screen game-screen">
+        <div class="game-container">
+            <div class="chapter-header">
+                <h2>Chapter 2: Inside Maya's Cells</h2>
+                <div class="story-context">
+                    <p>"Let's zoom into what's happening inside my cells..."</p>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="cell-stats">
+                    <div class="stat-box">
+                        <div class="stat-label">ATP Produced</div>
+                        <div class="stat-value" id="atp-produced">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Time</div>
+                        <div class="stat-value" id="cell-timer">60s</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Status</div>
+                        <div class="stat-value" id="cell-status">Working</div>
+                    </div>
+                </div>
+
+                <canvas id="cell-canvas" width="900" height="500"></canvas>
+
+                <div class="cell-instructions">
+                    <p><strong>Click nutrients (Green)</strong> to help produce ATP</p>
+                    <p><strong>Avoid mutations (Red)</strong> that damage the mitochondria</p>
+                    <p class="warning-text">⚠️ Maya's Complex IV is mutated - ATP production is impaired!</p>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="back-btn" onclick="returnToMenu()">← Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 3: The Doctor Visit -->
+    <div id="chapter3" class="screen">
+        <div class="story-container">
+            <div class="chapter-header">
+                <h2>Chapter 3: Understanding What's Wrong</h2>
+            </div>
+
+            <div class="dialogue-sequence">
+                <div class="dialogue-box">
+                    <div class="character-name">Dr. Martinez</div>
+                    <div id="doctor-dialogue" class="dialogue-text"></div>
+                </div>
+
+                <div id="diagram-area" class="interactive-diagram">
+                    <!-- ETC diagram will be rendered here -->
+                </div>
+
+                <div class="dialogue-box">
+                    <div class="character-name">Maya</div>
+                    <div id="maya-response" class="dialogue-text"></div>
+                </div>
+
+                <button class="continue-btn" onclick="nextDoctorDialogue()">Continue →</button>
+            </div>
+
+            <div class="game-controls">
+                <button class="back-btn" onclick="returnToMenu()">← Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 4: School Day -->
+    <div id="chapter4" class="screen game-screen">
+        <div class="game-container">
+            <div class="chapter-header">
+                <h2>Chapter 4: A Day at School</h2>
+                <div class="story-context">
+                    <p>"School is hard when you're constantly tired..."</p>
+                </div>
+            </div>
+
+            <div class="game-area">
+                <div class="school-scene">
+                    <div class="time-display">
+                        <span id="school-time">8:00 AM</span>
+                        <span id="school-period">First Period</span>
+                    </div>
+
+                    <div class="energy-display">
+                        <h3>Maya's Energy</h3>
+                        <div class="meter-bar large">
+                            <div id="school-energy-bar" class="meter-fill"></div>
+                        </div>
+                        <div class="energy-value"><span id="school-energy">80</span> / 100</div>
+                    </div>
+
+                    <div class="school-scenario">
+                        <h3 id="scenario-title">Morning Arrival</h3>
+                        <p id="scenario-desc" class="scenario-text"></p>
+                        <div id="scenario-choices" class="choice-buttons"></div>
+                    </div>
+
+                    <div class="consequence-box" id="consequence-display"></div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="back-btn" onclick="returnToMenu()">← Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chapter 5: ETC Interactive -->
+    <div id="chapter5" class="screen game-screen">
+        <div class="game-container">
+            <div class="chapter-header">
+                <h2>Chapter 5: The Electron Transport Chain</h2>
+                <div class="story-context">
+                    <p>"Dr. Martinez helped me understand exactly what's happening in my cells..."</p>
+                </div>
+            </div>
+
+            <div class="etc-interactive">
+                <div class="etc-explanation">
+                    <h3>How Healthy Cells Make Energy</h3>
+                    <p>Drag the molecules to see how the Electron Transport Chain normally works!</p>
+                </div>
+
+                <div class="molecules-bank">
+                    <h4>Available Molecules:</h4>
+                    <div id="etc-molecules" class="molecules-grid"></div>
+                </div>
+
+                <div class="etc-chain-visual">
+                    <div class="etc-complex" data-complex="1">
+                        <div class="complex-icon">I</div>
+                        <h4>Complex I</h4>
+                        <p class="complex-label">NADH Dehydrogenase</p>
+                        <div class="drop-zone" data-accepts="NADH"></div>
+                        <div class="complex-explanation">Accepts electrons from NADH</div>
+                    </div>
+
+                    <div class="etc-arrow">→</div>
+
+                    <div class="etc-complex" data-complex="2">
+                        <div class="complex-icon">II</div>
+                        <h4>Complex II</h4>
+                        <p class="complex-label">Succinate Dehydrogenase</p>
+                        <div class="drop-zone" data-accepts="FADH2"></div>
+                        <div class="complex-explanation">Accepts electrons from FADH₂</div>
+                    </div>
+
+                    <div class="etc-arrow">→</div>
+
+                    <div class="etc-complex" data-complex="3">
+                        <div class="complex-icon">III</div>
+                        <h4>Complex III</h4>
+                        <p class="complex-label">Cytochrome bc1</p>
+                        <div class="drop-zone" data-accepts="Electron"></div>
+                        <div class="complex-explanation">Transfers electrons</div>
+                    </div>
+
+                    <div class="etc-arrow">→</div>
+
+                    <div class="etc-complex mutated" data-complex="4">
+                        <div class="complex-icon">IV</div>
+                        <h4>Complex IV ⚠️</h4>
+                        <p class="complex-label">Cytochrome c Oxidase</p>
+                        <div class="drop-zone" data-accepts="O2"></div>
+                        <div class="complex-explanation">MUTATED in Maya - Can't use oxygen properly!</div>
+                    </div>
+
+                    <div class="etc-arrow">→</div>
+
+                    <div class="etc-complex" data-complex="5">
+                        <div class="complex-icon">V</div>
+                        <h4>Complex V</h4>
+                        <p class="complex-label">ATP Synthase</p>
+                        <div class="drop-zone" data-accepts="H+"></div>
+                        <div class="complex-explanation">Uses proton gradient to make ATP</div>
+                    </div>
+                </div>
+
+                <div class="etc-results" id="etc-results"></div>
+
+                <div class="maya-reflection">
+                    <div class="dialogue-box">
+                        <div class="character-name">Maya</div>
+                        <div class="dialogue-text" id="maya-etc-thoughts">
+                            Now I understand... my Complex IV can't process oxygen properly, so my whole energy system is blocked.
+                            That's why I get tired so easily.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="game-controls">
+                <button class="menu-btn" onclick="resetETC()">Try Again</button>
+                <button class="back-btn" onclick="returnToMenu()">← Main Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Story Conclusion -->
+    <div id="story-end" class="screen">
+        <div class="story-container">
+            <h1>Maya's Message</h1>
+            <div class="dialogue-box large">
+                <div class="character-portrait">
+                    <div class="avatar maya-avatar">M</div>
+                </div>
+                <div class="character-name">Maya</div>
+                <div class="dialogue-text">
+                    <p>"Thank you for taking the time to understand what life with Leigh Syndrome is like."</p>
+                    <p>"Every day is a challenge, but understanding the science behind it helps me and my doctors
+                       work together to manage my symptoms."</p>
+                    <p>"Leigh Syndrome affects everyone differently, but we all share the same struggle with energy
+                       production at the cellular level."</p>
+                    <p>"By learning about mitochondrial diseases, you're helping raise awareness. Thank you."</p>
+                </div>
+            </div>
+
+            <div class="info-box final-education">
+                <h3>Key Takeaways:</h3>
                 <ul>
-                    <li>Muscle weakness and poor muscle tone</li>
-                    <li>Loss of motor skills</li>
-                    <li>Seizures</li>
-                    <li>Difficulty breathing and swallowing</li>
-                    <li>Vision and hearing problems</li>
-                    <li>Developmental delays</li>
+                    <li>Mitochondria produce ATP through the Electron Transport Chain</li>
+                    <li>Leigh Syndrome is caused by mutations (often in Complex IV) that disrupt ATP production</li>
+                    <li>Low ATP affects high-energy organs like the brain and muscles</li>
+                    <li>Simple daily activities become exhausting when cells can't produce enough energy</li>
+                    <li>Understanding the biology helps us develop better treatments and support</li>
                 </ul>
             </div>
-            <div class="info-section">
-                <h3>🔬 Affected Systems</h3>
-                <p>The brain and nervous system require constant energy. When mitochondria fail, neurons (especially in the
-                   brainstem and basal ganglia) are severely affected, leading to neurological symptoms.</p>
-            </div>
-            <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
-        </div>
-    </div>
 
-    <!-- Tutorial Screen -->
-    <div id="tutorial-screen" class="screen">
-        <div class="container">
-            <h1 id="tutorial-title">Tutorial</h1>
-            <div id="tutorial-content" class="tutorial-box"></div>
-            <button class="menu-btn" onclick="startGameFromTutorial()">Start Game</button>
-            <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
-        </div>
-    </div>
-
-    <!-- Game 1: Mitochondria Defense -->
-    <div id="defense-game" class="screen game-screen">
-        <div class="game-container">
-            <div class="game-header">
-                <h2>Mitochondria Defense</h2>
-                <div class="stats">
-                    <div class="stat">ATP: <span id="defense-atp">100</span></div>
-                    <div class="stat">Score: <span id="defense-score">0</span></div>
-                    <div class="stat">Time: <span id="defense-time">60</span>s</div>
-                </div>
-            </div>
-            <canvas id="defense-canvas" width="800" height="600"></canvas>
-            <div class="game-controls">
-                <div id="defense-status" class="status-message"></div>
-                <button class="back-btn" onclick="endGame('defense')">End Game</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Game 2: Energy Meter Challenge -->
-    <div id="energy-game" class="screen game-screen">
-        <div class="game-container">
-            <div class="game-header">
-                <h2>Energy Meter Challenge</h2>
-                <div class="stats">
-                    <div class="stat">Tasks Completed: <span id="energy-tasks">0</span></div>
-                    <div class="stat">Round: <span id="energy-round">1</span></div>
-                </div>
-            </div>
-            <div class="energy-meter-container">
-                <h3>ATP Level</h3>
-                <div class="meter-bar">
-                    <div id="atp-bar" class="meter-fill"></div>
-                </div>
-                <div id="atp-value">100 / 100</div>
-            </div>
-            <div id="energy-task-area" class="task-area">
-                <h3 id="current-task">Click Start to Begin</h3>
-                <div id="task-buttons"></div>
-            </div>
-            <div id="energy-status" class="status-message"></div>
-            <div class="game-controls">
-                <button id="start-energy-btn" class="menu-btn" onclick="startEnergyGame()">Start</button>
-                <button class="back-btn" onclick="endGame('energy')">End Game</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Game 3: Pathway Puzzle -->
-    <div id="pathway-game" class="screen game-screen">
-        <div class="game-container">
-            <div class="game-header">
-                <h2>Electron Transport Chain Puzzle</h2>
-                <div class="stats">
-                    <div class="stat">Correct: <span id="pathway-correct">0</span></div>
-                    <div class="stat">Mistakes: <span id="pathway-mistakes">0</span></div>
-                </div>
-            </div>
-            <div class="pathway-area">
-                <div class="molecules-bank">
-                    <h3>Drag molecules to the correct complexes:</h3>
-                    <div id="molecules-container" class="molecules-grid"></div>
-                </div>
-                <div class="etc-chain">
-                    <div class="etc-complex" id="complex-1" data-complex="1">
-                        <h4>Complex I</h4>
-                        <p class="complex-name">NADH Dehydrogenase</p>
-                        <div class="drop-zone" data-accepts="NADH"></div>
-                    </div>
-                    <div class="etc-complex" id="complex-2" data-complex="2">
-                        <h4>Complex II</h4>
-                        <p class="complex-name">Succinate Dehydrogenase</p>
-                        <div class="drop-zone" data-accepts="FADH2"></div>
-                    </div>
-                    <div class="etc-complex" id="complex-3" data-complex="3">
-                        <h4>Complex III</h4>
-                        <p class="complex-name">Cytochrome bc1</p>
-                        <div class="drop-zone" data-accepts="Electron"></div>
-                    </div>
-                    <div class="etc-complex" id="complex-4" data-complex="4">
-                        <h4>Complex IV</h4>
-                        <p class="complex-name">Cytochrome c Oxidase</p>
-                        <div class="drop-zone" data-accepts="O2"></div>
-                    </div>
-                    <div class="etc-complex" id="complex-5" data-complex="5">
-                        <h4>Complex V</h4>
-                        <p class="complex-name">ATP Synthase</p>
-                        <div class="drop-zone" data-accepts="H+"></div>
-                    </div>
-                </div>
-                <div id="pathway-status" class="status-message"></div>
-                <div class="mutation-info">
-                    <p>⚠️ <strong>Leigh Syndrome Impact:</strong> Mutations in Complex IV prevent oxygen from accepting electrons,
-                       blocking the entire electron transport chain and drastically reducing ATP production!</p>
-                </div>
-            </div>
-            <div class="game-controls">
-                <button class="menu-btn" onclick="resetPathwayGame()">Reset Puzzle</button>
-                <button class="back-btn" onclick="endGame('pathway')">End Game</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Game Over Screen -->
-    <div id="gameover-screen" class="screen">
-        <div class="container">
-            <h1 id="gameover-title">Game Complete!</h1>
-            <div id="gameover-content" class="info-box"></div>
             <div class="menu-buttons">
-                <button class="menu-btn" onclick="restartCurrentGame()">Play Again</button>
-                <button class="back-btn" onclick="showScreen('main-menu')">← Back to Menu</button>
+                <button class="menu-btn" onclick="startStory()">Experience Story Again</button>
+                <button class="back-btn" onclick="showScreen('main-menu')">← Main Menu</button>
             </div>
         </div>
     </div>
