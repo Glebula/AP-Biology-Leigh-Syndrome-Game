@@ -238,11 +238,15 @@ let chapter2 = {
     ctx: null,
     particles: [],
     atp: 0,
+    atpRate: 1.0,  // ATP per second - starts low due to Leigh Syndrome
+    baseRate: 1.0,  // Baseline impaired rate
     timeLeft: 60,
     gameActive: false,
     animationId: null,
     timerInterval: null,
-    spawnInterval: null
+    spawnInterval: null,
+    atpProductionInterval: null,
+    rateDecayInterval: null
 };
 
 function initChapter2() {
@@ -250,6 +254,7 @@ function initChapter2() {
     chapter2.ctx = chapter2.canvas.getContext('2d');
     chapter2.particles = [];
     chapter2.atp = 0;
+    chapter2.atpRate = 1.0;
     chapter2.timeLeft = 60;
     chapter2.gameActive = true;
 
@@ -259,16 +264,34 @@ function initChapter2() {
     chapter2.animationId = requestAnimationFrame(updateCellGame);
     chapter2.timerInterval = setInterval(updateCellTimer, 1000);
     chapter2.spawnInterval = setInterval(spawnCellParticle, 800);
+
+    // Continuous ATP production based on current rate
+    chapter2.atpProductionInterval = setInterval(() => {
+        if (!chapter2.gameActive) return;
+        chapter2.atp += chapter2.atpRate / 10; // Divide by 10 because interval is 100ms
+        updateChapter2UI();
+    }, 100);
+
+    // Gradually return rate to baseline
+    chapter2.rateDecayInterval = setInterval(() => {
+        if (!chapter2.gameActive) return;
+        if (chapter2.atpRate > chapter2.baseRate) {
+            chapter2.atpRate = Math.max(chapter2.baseRate, chapter2.atpRate - 0.05);
+        } else if (chapter2.atpRate < chapter2.baseRate) {
+            chapter2.atpRate = Math.min(chapter2.baseRate, chapter2.atpRate + 0.05);
+        }
+        updateChapter2UI();
+    }, 200);
 }
 
 function spawnCellParticle() {
     if (!chapter2.gameActive) return;
 
     const types = [
-        { name: 'Glucose', color: '#00ff00', good: true, atp: 2 },
-        { name: 'O₂', color: '#00ffff', good: true, atp: 2 },
-        { name: 'Mutation', color: '#ff0000', good: false, atp: -3 },
-        { name: 'Toxin', color: '#ff6600', good: false, atp: -2 }
+        { name: 'Glucose', color: '#00ff00', good: true, rateChange: 0.8 },
+        { name: 'O₂', color: '#00ffff', good: true, rateChange: 0.8 },
+        { name: 'Mutation', color: '#ff0000', good: false, rateChange: -0.5 },
+        { name: 'Toxin', color: '#ff6600', good: false, rateChange: -0.4 }
     ];
 
     const type = types[Math.floor(Math.random() * types.length)];
@@ -348,16 +371,17 @@ function handleCellClick(event) {
         const dist = Math.sqrt((clickX - p.x) ** 2 + (clickY - p.y) ** 2);
 
         if (dist <= p.radius) {
-            chapter2.atp += p.atp;
+            // Modify ATP production rate
+            chapter2.atpRate = Math.max(0.1, chapter2.atpRate + p.rateChange);
             chapter2.particles.splice(i, 1);
             updateChapter2UI();
 
             const status = document.getElementById('cell-status');
             if (p.good) {
-                status.textContent = 'Working';
+                status.textContent = 'Boosted! +ATP/sec';
                 status.style.color = '#22c55e';
             } else {
-                status.textContent = 'Damaged!';
+                status.textContent = 'Damaged! -ATP/sec';
                 status.style.color = '#ef4444';
             }
             break;
@@ -376,19 +400,43 @@ function updateCellTimer() {
 }
 
 function updateChapter2UI() {
-    document.getElementById('atp-produced').textContent = chapter2.atp;
+    document.getElementById('atp-produced').textContent = Math.floor(chapter2.atp);
     document.getElementById('cell-timer').textContent = chapter2.timeLeft + 's';
+
+    // Update status to show current synthesis rate
+    const statusElement = document.getElementById('cell-status');
+    const rateDisplay = chapter2.atpRate.toFixed(1);
+
+    // Color code based on rate
+    if (chapter2.atpRate >= 2.5) {
+        statusElement.textContent = `Excellent! ${rateDisplay} ATP/sec`;
+        statusElement.style.color = '#22c55e';
+    } else if (chapter2.atpRate >= 1.5) {
+        statusElement.textContent = `Good! ${rateDisplay} ATP/sec`;
+        statusElement.style.color = '#3b82f6';
+    } else if (chapter2.atpRate >= 0.8) {
+        statusElement.textContent = `Impaired... ${rateDisplay} ATP/sec`;
+        statusElement.style.color = '#fbbf24';
+    } else {
+        statusElement.textContent = `Critical! ${rateDisplay} ATP/sec`;
+        statusElement.style.color = '#ef4444';
+    }
 }
 
 function completeChapter2() {
     chapter2.gameActive = false;
     clearInterval(chapter2.timerInterval);
     clearInterval(chapter2.spawnInterval);
+    clearInterval(chapter2.atpProductionInterval);
+    clearInterval(chapter2.rateDecayInterval);
     cancelAnimationFrame(chapter2.animationId);
 
-    const message = chapter2.atp < 30
-        ? `You produced only ${chapter2.atp} ATP in 60 seconds.\n\nHealthy mitochondria produce hundreds of ATP per second.\n\nThis is why Maya is always exhausted - her cells are starving for energy.`
-        : `You produced ${chapter2.atp} ATP - better than Maya's cells usually do!\n\nBut even this is far below what healthy mitochondria produce.\n\nLet's see what the doctor says about this...`;
+    const totalATP = Math.floor(chapter2.atp);
+    const avgRate = (totalATP / 60).toFixed(1);
+
+    const message = totalATP < 80
+        ? `You produced only ${totalATP} ATP in 60 seconds (${avgRate} ATP/sec average).\n\nHealthy mitochondria produce 30-50 ATP per second!\n\nThis is why Maya is always exhausted - her cells are starving for energy.`
+        : `You produced ${totalATP} ATP in 60 seconds (${avgRate} ATP/sec average)!\n\nThat's better than Maya's cells usually do, but still far below the 30-50 ATP/sec that healthy mitochondria produce.\n\nLet's see what the doctor says about this...`;
 
     setTimeout(() => {
         if (confirm(message + "\n\nContinue to Chapter 3?")) {
