@@ -32,7 +32,7 @@ function returnToMenu() {
 // ==========================================
 
 const introDialogues = [
-    "Hi, I'm Maya. I'm 16 years old.",
+    "Hi, I'm Maya. I'm 16 years old, and I live at 67 Maple Street.",
     "I have Leigh Syndrome - a rare genetic disorder that affects my mitochondria.",
     "You've probably learned that mitochondria are the 'powerhouses' of cells, right?",
     "Well, mine don't work properly. They can't produce enough ATP - the energy my cells need.",
@@ -535,9 +535,9 @@ let chapter4 = {
     scenarios: [
         {
             time: "8:00 AM",
-            period: "First Period - Math",
+            period: "First Period - Math (Room 67)",
             title: "First Class",
-            description: "You made it to school but already used energy this morning. Math class requires concentration.",
+            description: "You made it to school but already used energy this morning. Math class in Room 67 requires concentration.",
             choices: [
                 { text: "Focus intensely on the lesson", energy: -25, consequence: "You understand the material but feel dizzy from the effort." },
                 { text: "Take notes slowly, rest between problems", energy: -15, consequence: "You miss some details but conserve energy for later." }
