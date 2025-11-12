@@ -240,7 +240,7 @@ let chapter2 = {
     atp: 0,
     atpRate: 0.4,  // ATP per second - severely impaired due to Leigh Syndrome
     baseRate: 0.4,  // Baseline impaired rate (healthy = 30-50 ATP/sec!)
-    timeLeft: 60,
+    timeLeft: 20,
     gameActive: false,
     animationId: null,
     timerInterval: null,
@@ -255,7 +255,7 @@ function initChapter2() {
     chapter2.particles = [];
     chapter2.atp = 0;
     chapter2.atpRate = 0.4;
-    chapter2.timeLeft = 60;
+    chapter2.timeLeft = 20;
     chapter2.gameActive = true;
 
     updateChapter2UI();
@@ -432,13 +432,13 @@ function completeChapter2() {
     cancelAnimationFrame(chapter2.animationId);
 
     const totalATP = Math.floor(chapter2.atp);
-    const avgRate = (totalATP / 60).toFixed(2);
+    const avgRate = (totalATP / 20).toFixed(2);
 
-    // Context: Healthy mitochondria produce 1800-3000 ATP in 60 seconds (30-50 per second)
-    // Maya's impaired mitochondria produce 24-60 ATP in 60 seconds (0.4-1.0 per second)
-    const message = totalATP < 45
-        ? `You produced only ${totalATP} ATP in 60 seconds (${avgRate} ATP/sec average).\n\nHealthy mitochondria produce 30-50 ATP per SECOND - that's 1,800-3,000 ATP in 60 seconds!\n\nMaya's cells produce only ${((totalATP/1800)*100).toFixed(1)}% of normal. This is why she's always exhausted - her cells are starving for energy.`
-        : `You produced ${totalATP} ATP in 60 seconds (${avgRate} ATP/sec average)!\n\nThat's better than Maya's cells usually manage, but still only ${((totalATP/1800)*100).toFixed(1)}% of what healthy mitochondria produce (1,800-3,000 ATP in 60 seconds).\n\nLet's see what the doctor says about this...`;
+    // Context: Healthy mitochondria produce 600-1000 ATP in 20 seconds (30-50 per second)
+    // Maya's impaired mitochondria produce 8-20 ATP in 20 seconds (0.4-1.0 per second)
+    const message = totalATP < 15
+        ? `You produced only ${totalATP} ATP in 20 seconds (${avgRate} ATP/sec average).\n\nHealthy mitochondria produce 30-50 ATP per SECOND - that's 600-1,000 ATP in 20 seconds!\n\nMaya's cells produce only ${((totalATP/600)*100).toFixed(1)}% of normal. This is why she's always exhausted - her cells are starving for energy.`
+        : `You produced ${totalATP} ATP in 20 seconds (${avgRate} ATP/sec average)!\n\nThat's better than Maya's cells usually manage, but still only ${((totalATP/600)*100).toFixed(1)}% of what healthy mitochondria produce (600-1,000 ATP in 20 seconds).\n\nLet's see what the doctor says about this...`;
 
     setTimeout(() => {
         if (confirm(message + "\n\nContinue to Chapter 3?")) {
